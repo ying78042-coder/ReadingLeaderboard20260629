@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reading Leaderboard</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="setup-panel" aria-labelledby="page-title">
+        <div class="brand-row">
+          <div class="brand-mark" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <p>Reading Club</p>
+        </div>
+
+        <aside id="server-url-card" class="server-url-card" hidden>
+          <span>Server URL</span>
+          <strong id="server-url-text">http://127.0.0.1:5173/</strong>
+        </aside>
+
+        <div class="intro-copy">
+          <h1 id="page-title">Join the reading leaderboard</h1>
+          <p>Add your reader, choose goals, and see today’s climb.</p>
+        </div>
+
+        <form id="reader-form" class="reader-form">
+          <fieldset>
+            <legend>Reader</legend>
+            <label>
+              Name
+              <input id="reader-name" name="reader-name" type="text" maxlength="24" placeholder="Avery" required />
+            </label>
+            <label>
+              Password
+              <input id="reader-password" name="reader-password" type="password" maxlength="40" value="admin" required />
+            </label>
+          </fieldset>
+
+          <div class="form-actions">
+            <button type="button" id="reset-button" class="secondary-button">Reset</button>
+            <button type="submit" class="primary-button">Add me</button>
+          </div>
+        </form>
+
+        <section class="timer-panel" aria-labelledby="timer-title">
+          <div>
+            <p class="eyebrow">Reading timer</p>
+            <h2 id="timer-title">Session</h2>
+          </div>
+          <label>
+            Reader name
+            <select id="timer-reader-name">
+              <option value="">Choose a reader</option>
+            </select>
+          </label>
+          <div id="timer-display" class="timer-display" aria-live="polite">00:00:00</div>
+          <p id="timer-status" class="timer-status" aria-live="polite">Ready</p>
+          <div class="form-actions">
+            <button type="button" id="start-timer-button" class="primary-button">Start</button>
+            <button type="button" id="stop-timer-button" class="secondary-button" disabled>Stop</button>
+            <button type="button" id="comment-session-button" class="secondary-button comment-session-button" disabled>Comment</button>
+          </div>
+        </section>
+      </section>
+
+      <section class="board-panel" aria-labelledby="leaderboard-title">
+        <div class="shelf-art" aria-hidden="true">
+          <div class="sun"></div>
+          <div class="book-stack stack-one"></div>
+          <div class="book-stack stack-two"></div>
+          <div class="book-stack stack-three"></div>
+        </div>
+
+        <div class="board-header">
+          <div>
+            <p class="eyebrow">Live board</p>
+            <h2 id="leaderboard-title">Leaderboard</h2>
+          </div>
+          <div class="board-tools">
+            <label class="date-picker">
+              Date
+              <input id="progress-date" type="date" />
+            </label>
+            <div id="reader-rank" class="rank-pill">Add a reader</div>
+          </div>
+        </div>
+
+        <div class="progress-strip" aria-label="Goal progress">
+          <article>
+            <span>Daily</span>
+            <strong id="daily-progress-text">0 / 20 min</strong>
+            <div class="meter"><span id="daily-meter"></span></div>
+          </article>
+          <article>
+            <span>Weekly</span>
+            <strong id="weekly-progress-text">0 / 120 min</strong>
+            <div class="meter"><span id="weekly-meter"></span></div>
+          </article>
+        </div>
+
+        <div class="subject-strip" aria-label="Daily and weekly subject reading time">
+          <article class="subject-card english-subject-card">
+            <span>Daily English</span>
+            <strong id="daily-english-time-text">0 min</strong>
+          </article>
+          <article class="subject-card english-subject-card">
+            <span>Weekly English</span>
+            <strong id="weekly-english-time-text">0 min</strong>
+          </article>
+          <article class="subject-card english-presentation-subject-card">
+            <span>Daily English presentation</span>
+            <strong id="daily-english-presentation-time-text">0 min</strong>
+          </article>
+          <article class="subject-card english-presentation-subject-card">
+            <span>Weekly English presentation</span>
+            <strong id="weekly-english-presentation-time-text">0 min</strong>
+          </article>
+          <article class="subject-card chinese-subject-card">
+            <span>Daily Chinese</span>
+            <strong id="daily-chinese-time-text">0 min</strong>
+          </article>
+          <article class="subject-card chinese-subject-card">
+            <span>Weekly Chinese</span>
+            <strong id="weekly-chinese-time-text">0 min</strong>
+          </article>
+          <article class="subject-card chinese-presentation-subject-card">
+            <span>Daily Chinese presentation</span>
+            <strong id="daily-chinese-presentation-time-text">0 min</strong>
+          </article>
+          <article class="subject-card chinese-presentation-subject-card">
+            <span>Weekly Chinese presentation</span>
+            <strong id="weekly-chinese-presentation-time-text">0 min</strong>
+          </article>
+          <article class="subject-card math-subject-card">
+            <span>Daily Math</span>
+            <strong id="daily-math-time-text">0 min</strong>
+          </article>
+          <article class="subject-card math-subject-card">
+            <span>Weekly Math</span>
+            <strong id="weekly-math-time-text">0 min</strong>
+          </article>
+        </div>
+
+        <ol id="leaderboard-list" class="leaderboard-list" aria-live="polite"></ol>
+      </section>
+    </main>
+
+    <div id="goals-modal" class="modal-backdrop" hidden>
+      <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="goals-modal-title">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Update goals</p>
+            <h2 id="goals-modal-title">Daily goals</h2>
+          </div>
+          <button type="button" id="close-goals-modal" class="icon-button" aria-label="Close goals dialog">×</button>
+        </div>
+
+        <form id="goals-modal-form" class="modal-form">
+          <input id="goals-reader-name" type="hidden" />
+          <div class="subject-goal-grid" aria-label="Selected reader subject goals">
+            <div class="subject-goal-group">
+              <h3>English</h3>
+              <label>
+                Weekday
+                <input id="modal-english-workday-goal" type="number" min="0" max="240" step="5" required />
+              </label>
+              <label>
+                Weekend
+                <input id="modal-english-weekend-goal" type="number" min="0" max="240" step="5" required />
+              </label>
+            </div>
+            <div class="subject-goal-group">
+              <h3>English presentation</h3>
+              <label>
+                Weekday
+                <input id="modal-english-presentation-workday-goal" type="number" min="0" max="240" step="5" required />
+              </label>
+              <label>
+                Weekend
+                <input id="modal-english-presentation-weekend-goal" type="number" min="0" max="240" step="5" required />
+              </label>
+            </div>
+            <div class="subject-goal-group">
+              <h3>Chinese</h3>
+              <label>
+                Weekday
+                <input id="modal-chinese-workday-goal" type="number" min="0" max="240" step="5" required />
+              </label>
+              <label>
+                Weekend
+                <input id="modal-chinese-weekend-goal" type="number" min="0" max="240" step="5" required />
+              </label>
+            </div>
+            <div class="subject-goal-group">
+              <h3>Chinese presentation</h3>
+              <label>
+                Weekday
+                <input id="modal-chinese-presentation-workday-goal" type="number" min="0" max="240" step="5" required />
+              </label>
+              <label>
+                Weekend
+                <input id="modal-chinese-presentation-weekend-goal" type="number" min="0" max="240" step="5" required />
+              </label>
+            </div>
+            <div class="subject-goal-group">
+              <h3>Math</h3>
+              <label>
+                Weekday
+                <input id="modal-math-workday-goal" type="number" min="0" max="240" step="5" required />
+              </label>
+              <label>
+                Weekend
+                <input id="modal-math-weekend-goal" type="number" min="0" max="240" step="5" required />
+              </label>
+            </div>
+          </div>
+          <p id="goals-modal-message" class="modal-message" aria-live="polite"></p>
+          <div class="form-actions">
+            <button type="button" id="cancel-goals-update" class="secondary-button">Cancel</button>
+            <button type="submit" class="primary-button">Save goals</button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <div id="subject-modal" class="modal-backdrop" hidden>
+      <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="subject-modal-title">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Choose subject</p>
+            <h2 id="subject-modal-title">Start session</h2>
+          </div>
+          <button type="button" id="close-subject-modal" class="icon-button" aria-label="Close subject dialog">×</button>
+        </div>
+
+        <div class="subject-actions" aria-label="Subject choices">
+          <button type="button" class="subject-button" data-subject="English">English</button>
+          <button type="button" class="subject-button" data-subject="English presentation">English presentation</button>
+          <button type="button" class="subject-button" data-subject="Chinese">Chinese</button>
+          <button type="button" class="subject-button" data-subject="Chinese presentation">Chinese presentation</button>
+          <button type="button" class="subject-button" data-subject="Math">Math</button>
+        </div>
+      </section>
+    </div>
+
+    <div id="record-modal" class="modal-backdrop" hidden>
+      <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="record-modal-title">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Update record</p>
+            <h2 id="record-modal-title">Reading minutes</h2>
+          </div>
+          <button type="button" id="close-record-modal" class="icon-button" aria-label="Close record dialog">×</button>
+        </div>
+
+        <form id="record-modal-form" class="modal-form">
+          <input id="record-reader-name" type="hidden" />
+          <label>
+            Date
+            <input id="record-date" type="date" required />
+          </label>
+          <div class="subject-record-grid" aria-label="Selected reader subject record">
+            <label>
+              English
+              <input id="record-english-minutes" type="number" min="0" max="720" step="1" required />
+            </label>
+            <label>
+              English presentation
+              <input id="record-english-presentation-minutes" type="number" min="0" max="720" step="1" required />
+            </label>
+            <label>
+              Chinese
+              <input id="record-chinese-minutes" type="number" min="0" max="720" step="1" required />
+            </label>
+            <label>
+              Chinese presentation
+              <input id="record-chinese-presentation-minutes" type="number" min="0" max="720" step="1" required />
+            </label>
+            <label>
+              Math
+              <input id="record-math-minutes" type="number" min="0" max="720" step="1" required />
+            </label>
+          </div>
+          <p id="record-modal-message" class="modal-message" aria-live="polite"></p>
+          <div class="form-actions">
+            <button type="button" id="cancel-record-update" class="secondary-button">Cancel</button>
+            <button type="submit" class="primary-button">Save record</button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <div id="comment-modal" class="modal-backdrop" hidden>
+      <section class="modal-card comment-modal-card" role="dialog" aria-modal="true" aria-labelledby="comment-modal-title">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Session comment</p>
+            <h2 id="comment-modal-title">Daily comment</h2>
+          </div>
+          <button type="button" id="close-comment-modal" class="icon-button" aria-label="Close comment dialog">×</button>
+        </div>
+
+        <form id="comment-modal-form" class="modal-form">
+          <input id="comment-reader-name" type="hidden" />
+          <label>
+            Date
+            <input id="comment-date" type="date" required />
+          </label>
+          <label>
+            Subject
+            <select id="comment-subject" required>
+              <option value="English">English</option>
+              <option value="English presentation">English presentation</option>
+              <option value="Chinese">Chinese</option>
+              <option value="Chinese presentation">Chinese presentation</option>
+              <option value="Math">Math</option>
+            </select>
+          </label>
+          <label>
+            Comment
+            <textarea id="comment-text" rows="6" maxlength="160" placeholder="Optional note"></textarea>
+          </label>
+          <p id="comment-modal-message" class="modal-message" aria-live="polite"></p>
+          <div class="form-actions">
+            <button type="button" id="cancel-comment-update" class="secondary-button">Cancel</button>
+            <button type="submit" class="primary-button">Save comments</button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <div id="week-record-modal" class="modal-backdrop" hidden>
+      <section class="modal-card wide-modal-card" role="dialog" aria-modal="true" aria-labelledby="week-record-modal-title">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Weekly subject record</p>
+            <h2 id="week-record-modal-title">Daily records</h2>
+            <p id="week-record-reader-name" class="modal-subtitle"></p>
+          </div>
+          <button type="button" id="close-week-record-modal" class="icon-button" aria-label="Close weekly record dialog">×</button>
+        </div>
+
+        <div class="week-record-content">
+          <div class="week-record-tools">
+            <input id="week-record-reader-id" type="hidden" />
+            <label>
+              Week
+              <input id="week-record-week" type="week" />
+            </label>
+          </div>
+
+          <div id="week-subject-summary" class="week-subject-summary" aria-label="Weekly subject reading percentages"></div>
+
+          <div id="week-record-chart" class="week-record-chart" aria-label="Daily subject goal percentage histograms"></div>
+
+          <div class="week-record-table-wrap">
+            <table class="week-record-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>English</th>
+                  <th>English presentation</th>
+                  <th>Chinese</th>
+                  <th>Chinese presentation</th>
+                  <th>Math</th>
+                  <th>Total</th>
+                  <th>Comments</th>
+                </tr>
+              </thead>
+              <tbody id="week-record-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div id="week-comment-modal" class="modal-backdrop" hidden>
+      <section class="modal-card week-comment-card" role="dialog" aria-modal="true" aria-labelledby="week-comment-modal-title">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Reading comment</p>
+            <h2 id="week-comment-modal-title">Comment</h2>
+            <p id="week-comment-meta" class="modal-subtitle"></p>
+          </div>
+          <button type="button" id="close-week-comment-modal" class="icon-button" aria-label="Close comment dialog">×</button>
+        </div>
+
+        <p id="week-comment-text" class="week-comment-text"></p>
+      </section>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
