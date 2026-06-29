@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: reading-leaderboard-database
+    runtime: python
+    plan: free
+    buildCommand: python -m py_compile server.py
+    startCommand: python server.py
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
+      - key: PORT
+        value: 10000
